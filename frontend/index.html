@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마켓플레이스 요율 관리 시스템</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>마켓플레이스 요율 관리 시스템</h1>
+            <p class="subtitle">브랜드별 마켓플레이스 배송비 및 수수료 관리</p>
+        </header>
+
+        <div class="controls">
+            <div class="filter-section">
+                <label for="brandFilter">브랜드 필터:</label>
+                <select id="brandFilter">
+                    <option value="">전체 브랜드</option>
+                </select>
+            </div>
+            <button id="addNewBtn" class="btn btn-primary">+ 새 요율 추가</button>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <h3>총 레코드 수</h3>
+                <p id="totalRecords">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>브랜드 수</h3>
+                <p id="totalBrands">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>마켓플레이스 수</h3>
+                <p id="totalMarketplaces">0</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="ratesTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>브랜드</th>
+                        <th>마켓플레이스</th>
+                        <th>배송비율</th>
+                        <th>수수료율</th>
+                        <th>생성일</th>
+                        <th>수정일</th>
+                        <th>작업</th>
+                    </tr>
+                </thead>
+                <tbody id="ratesTableBody">
+                    <tr>
+                        <td colspan="8" class="loading">데이터 로딩 중...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit -->
+    <div id="rateModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">새 요율 추가</h2>
+            <form id="rateForm">
+                <div class="form-group">
+                    <label for="brand">브랜드 *</label>
+                    <input type="text" id="brand" required>
+                </div>
+                <div class="form-group">
+                    <label for="marketplace">마켓플레이스 *</label>
+                    <input type="text" id="marketplace" required>
+                </div>
+                <div class="form-group">
+                    <label for="shipping">배송비율 (0-1) *</label>
+                    <input type="number" id="shipping" step="0.001" min="0" max="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="commission">수수료율 (0-1) *</label>
+                    <input type="number" id="commission" step="0.001" min="0" max="1" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">저장</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Edit (Update) -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close edit-close">&times;</span>
+            <h2>요율 수정</h2>
+            <form id="editForm">
+                <input type="hidden" id="editRateId">
+                <div class="form-group">
+                    <label>브랜드</label>
+                    <input type="text" id="editBrand" disabled>
+                </div>
+                <div class="form-group">
+                    <label>마켓플레이스</label>
+                    <input type="text" id="editMarketplace" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="editShipping">배송비율 (0-1) *</label>
+                    <input type="number" id="editShipping" step="0.001" min="0" max="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCommission">수수료율 (0-1) *</label>
+                    <input type="number" id="editCommission" step="0.001" min="0" max="1" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">수정 저장</button>
+                    <button type="button" class="btn btn-secondary edit-cancel">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
