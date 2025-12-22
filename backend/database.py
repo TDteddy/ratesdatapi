@@ -6,7 +6,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    database_url: str = "mysql+pymysql://root:rootpassword@localhost:3306/marketplace_rates"
+    database_url: str = "mysql+pymysql://root:rootpassword@bryze.kr:3306/marketplace_rates"
 
     class Config:
         env_file = ".env"
