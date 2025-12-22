@@ -105,3 +105,8 @@ async def get_all_brands(db: Session = Depends(get_db)):
 async def get_all_marketplaces(db: Session = Depends(get_db)):
     """모든 마켓플레이스 목록 조회"""
     return crud.get_all_marketplaces(db)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=5005, reload=True)

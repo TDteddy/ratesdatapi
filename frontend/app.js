@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://localhost:5005/api';
 
 let allRates = [];
 let currentEditId = null;
