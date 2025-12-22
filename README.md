@@ -71,8 +71,26 @@ cd ratesdatapi
 
 2. **환경 변수 설정**
 ```bash
-cp .env.example .env
+cd backend
+cp ../.env.example .env
 ```
+
+`.env` 파일을 열어서 데이터베이스 설정을 입력하세요:
+
+**방법 1: 개별 설정 (권장 - 비밀번호 자동 인코딩)**
+```env
+DB_USER=root
+DB_PASSWORD=your_password@123*!  # 특수문자 그대로 입력 가능
+DB_HOST=bryze.kr
+DB_PORT=3306
+DB_NAME=marketplace_rates
+```
+
+**방법 2: 전체 URL (비밀번호를 직접 인코딩)**
+```env
+DATABASE_URL=mysql+pymysql://root:your_password%40123%2A%21@bryze.kr:3306/marketplace_rates
+```
+특수문자 인코딩: `@` → `%40`, `*` → `%2A`, `!` → `%21`
 
 3. **Docker Compose로 시작**
 ```bash
@@ -80,10 +98,10 @@ docker-compose up -d
 ```
 
 4. **서비스 확인**
-- Backend API: http://localhost:8000
-- API 문서: http://localhost:8000/docs
-- Frontend: http://localhost:8000/static/index.html
-- MySQL: localhost:3306
+- Backend API: http://localhost:5005
+- API 문서: http://localhost:5005/docs
+- Frontend: http://localhost:5005/static/index.html
+- MySQL: bryze.kr:3306
 
 ### 로컬에서 실행하기
 
@@ -101,11 +119,15 @@ mysql -u root -p < database/seed.sql
 cd backend
 pip install -r requirements.txt
 
-# 환경 변수 설정
-export DATABASE_URL="mysql+pymysql://root:rootpassword@localhost:3306/marketplace_rates"
+# 환경 변수 설정 (.env 파일 생성)
+cp ../.env.example .env
+# .env 파일 편집하여 DB 정보 입력
 
-# 서버 시작
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+# 서버 시작 (간편 실행)
+python3 main.py
+
+# 또는 직접 uvicorn 실행
+# uvicorn main:app --reload --host 0.0.0.0 --port 5005
 ```
 
 #### Frontend 접속
@@ -118,6 +140,8 @@ python -m http.server 8080
 ```
 
 그 다음 http://localhost:8080 접속
+
+**주의:** `frontend/app.js`의 API_BASE_URL을 백엔드 주소에 맞게 수정하세요.
 
 ## API 엔드포인트
 
