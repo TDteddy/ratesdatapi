@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from typing import List
 import models
@@ -20,7 +19,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS 설정
+# CORS 설정 (Apache에서 프론트엔드 서비스)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,9 +27,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# 정적 파일 서빙 (프론트엔드)
-app.mount("/static", StaticFiles(directory="../frontend"), name="static")
 
 
 @app.get("/")
