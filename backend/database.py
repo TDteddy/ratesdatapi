@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     db_host: str = "bryze.kr"
     db_port: int = 3306
     db_name: str = "marketplace_rates"
-    sales_db_name: str = "sales"
+    sales_db_name: str = "seller_mapping"
 
     class Config:
         env_file = ".env"
