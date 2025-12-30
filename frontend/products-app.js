@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://bryze.kr:5005/api';
+const API_BASE_URL = 'https://bryze.kr:5005/api';
 
 let allProducts = [];
 let currentEditId = null;
