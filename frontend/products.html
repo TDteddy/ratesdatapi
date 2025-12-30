@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스탠다드 상품 관리 시스템</title>
+    <link rel="stylesheet" href="products-styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>스탠다드 상품 관리 시스템</h1>
+            <p class="subtitle">이지어드민 스탠다드 상품 및 원가 관리</p>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">마켓플레이스 요율 관리</a>
+                <a href="products.html" class="nav-link active">스탠다드 상품 관리</a>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="filter-section">
+                <label for="brandFilter">브랜드 필터:</label>
+                <select id="brandFilter">
+                    <option value="">전체 브랜드</option>
+                </select>
+
+                <label for="searchInput">상품명 검색:</label>
+                <input type="text" id="searchInput" placeholder="상품명 입력...">
+                <button id="searchBtn" class="btn btn-secondary">검색</button>
+            </div>
+            <button id="addNewBtn" class="btn btn-primary">+ 새 상품 추가</button>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <h3>총 상품 수</h3>
+                <p id="totalProducts">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>브랜드 수</h3>
+                <p id="totalBrands">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>평균 원가</h3>
+                <p id="avgCost">₩0</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="productsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>상품명</th>
+                        <th>브랜드</th>
+                        <th>원가 (부가세 포함)</th>
+                        <th>생성일</th>
+                        <th>수정일</th>
+                        <th>작업</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    <tr>
+                        <td colspan="7" class="loading">데이터 로딩 중...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Add -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">새 상품 추가</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productName">상품명 *</label>
+                    <input type="text" id="productName" required maxlength="500">
+                </div>
+                <div class="form-group">
+                    <label for="brand">브랜드 *</label>
+                    <select id="brand" required>
+                        <option value="">선택하세요</option>
+                        <option value="닥터시드">닥터시드</option>
+                        <option value="딸로">딸로</option>
+                        <option value="테르스">테르스</option>
+                        <option value="에이더">에이더</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="costPrice">원가 (부가세 포함) *</label>
+                    <input type="number" id="costPrice" step="0.01" min="0" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">저장</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Edit -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close edit-close">&times;</span>
+            <h2>상품 수정</h2>
+            <form id="editForm">
+                <input type="hidden" id="editProductId">
+                <div class="form-group">
+                    <label for="editProductName">상품명 *</label>
+                    <input type="text" id="editProductName" required maxlength="500">
+                </div>
+                <div class="form-group">
+                    <label for="editBrand">브랜드 *</label>
+                    <select id="editBrand" required>
+                        <option value="닥터시드">닥터시드</option>
+                        <option value="딸로">딸로</option>
+                        <option value="테르스">테르스</option>
+                        <option value="에이더">에이더</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editCostPrice">원가 (부가세 포함) *</label>
+                    <input type="number" id="editCostPrice" step="0.01" min="0" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">수정 저장</button>
+                    <button type="button" class="btn btn-secondary edit-cancel">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="products-app.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -21,7 +21,7 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     color: white;
     padding: 30px;
     text-align: center;
@@ -66,12 +66,15 @@ header .subtitle {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #e0e0e0;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .filter-section {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .filter-section label {
@@ -79,11 +82,19 @@ header .subtitle {
     color: #333;
 }
 
-.filter-section select {
+.filter-section select,
+.filter-section input[type="text"] {
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 14px;
+}
+
+.filter-section select {
+    min-width: 150px;
+}
+
+.filter-section input[type="text"] {
     min-width: 200px;
 }
 
@@ -112,7 +123,7 @@ header .subtitle {
 .stat-card p {
     font-size: 2em;
     font-weight: bold;
-    color: #667eea;
+    color: #11998e;
 }
 
 .table-container {
@@ -134,7 +145,7 @@ th {
     text-align: left;
     font-weight: 600;
     color: #333;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 2px solid #11998e;
 }
 
 td {
@@ -163,14 +174,14 @@ tr:hover {
 }
 
 .btn-primary {
-    background: #667eea;
+    background: #11998e;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #5568d3;
+    background: #0e7c6f;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 8px rgba(17, 153, 142, 0.4);
 }
 
 .btn-secondary {
@@ -274,7 +285,8 @@ tr:hover {
     color: #333;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -282,14 +294,10 @@ tr:hover {
     font-size: 14px;
 }
 
-.form-group input:disabled {
-    background: #f8f9fa;
-    cursor: not-allowed;
-}
-
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #11998e;
 }
 
 .form-actions {
@@ -335,9 +343,9 @@ tr:hover {
     display: block;
 }
 
-.rate-value {
+.price-value {
     font-weight: 600;
-    color: #667eea;
+    color: #11998e;
 }
 
 .action-btns {
@@ -347,7 +355,6 @@ tr:hover {
 @media (max-width: 768px) {
     .controls {
         flex-direction: column;
-        gap: 15px;
         align-items: stretch;
     }
 
@@ -356,7 +363,8 @@ tr:hover {
         align-items: stretch;
     }
 
-    .filter-section select {
+    .filter-section select,
+    .filter-section input {
         width: 100%;
     }
 

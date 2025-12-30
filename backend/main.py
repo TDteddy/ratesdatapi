@@ -6,9 +6,13 @@ from typing import List
 import models
 import schemas
 import crud
-from database import engine, get_db
+import product_models
+import product_schemas
+import product_crud
+from database import engine, get_db, sales_engine, get_sales_db
 
 models.Base.metadata.create_all(bind=engine)
+product_models.SalesBase.metadata.create_all(bind=sales_engine)
 
 app = FastAPI(
     title="Marketplace Rates API",
@@ -105,6 +109,82 @@ async def get_all_brands(db: Session = Depends(get_db)):
 async def get_all_marketplaces(db: Session = Depends(get_db)):
     """모든 마켓플레이스 목록 조회"""
     return crud.get_all_marketplaces(db)
+
+
+# ============== Standard Products API ==============
+
+@app.get("/api/products", response_model=List[product_schemas.StandardProductResponse])
+async def get_all_products(skip: int = 0, limit: int = 1000, db: Session = Depends(get_sales_db)):
+    """모든 스탠다드 상품 조회"""
+    products = product_crud.get_all_products(db, skip=skip, limit=limit)
+    return products
+
+
+@app.get("/api/products/search", response_model=List[product_schemas.StandardProductResponse])
+async def search_products(q: str, db: Session = Depends(get_sales_db)):
+    """상품명으로 검색"""
+    products = product_crud.search_products(db, q)
+    return products
+
+
+@app.get("/api/products/brand/{brand}", response_model=List[product_schemas.StandardProductResponse])
+async def get_products_by_brand(brand: str, db: Session = Depends(get_sales_db)):
+    """특정 브랜드의 모든 상품 조회"""
+    products = product_crud.get_products_by_brand(db, brand)
+    if not products:
+        raise HTTPException(status_code=404, detail=f"Brand '{brand}' not found")
+    return products
+
+
+@app.get("/api/products/{product_id}", response_model=product_schemas.StandardProductResponse)
+async def get_product(product_id: int, db: Session = Depends(get_sales_db)):
+    """특정 상품 조회"""
+    product = product_crud.get_product_by_id(db, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+
+@app.post("/api/products", response_model=product_schemas.StandardProductResponse, status_code=status.HTTP_201_CREATED)
+async def create_product(product: product_schemas.StandardProductCreate, db: Session = Depends(get_sales_db)):
+    """새로운 스탠다드 상품 생성"""
+    # 중복 확인
+    existing_product = product_crud.get_product_by_name(db, product.product_name)
+    if existing_product:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Product '{product.product_name}' already exists"
+        )
+
+    return product_crud.create_product(db, product)
+
+
+@app.put("/api/products/{product_id}", response_model=product_schemas.StandardProductResponse)
+async def update_product(
+    product_id: int,
+    product_update: product_schemas.StandardProductUpdate,
+    db: Session = Depends(get_sales_db)
+):
+    """스탠다드 상품 수정"""
+    updated_product = product_crud.update_product(db, product_id, product_update)
+    if not updated_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return updated_product
+
+
+@app.delete("/api/products/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_product(product_id: int, db: Session = Depends(get_sales_db)):
+    """스탠다드 상품 삭제"""
+    success = product_crud.delete_product(db, product_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return None
+
+
+@app.get("/api/products-brands", response_model=List[str])
+async def get_product_brands(db: Session = Depends(get_sales_db)):
+    """모든 상품 브랜드 목록 조회"""
+    return product_crud.get_all_brands(db)
 
 
 if __name__ == "__main__":
