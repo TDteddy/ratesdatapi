@@ -98,6 +98,11 @@ header .subtitle {
     min-width: 200px;
 }
 
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
 .stats-section {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -191,6 +196,17 @@ tr:hover {
 
 .btn-secondary:hover {
     background: #5a6268;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
 }
 
 .btn-edit {

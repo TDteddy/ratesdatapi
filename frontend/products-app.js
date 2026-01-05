@@ -9,6 +9,8 @@ const brandFilter = document.getElementById('brandFilter');
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
 const addNewBtn = document.getElementById('addNewBtn');
+const uploadExcelBtn = document.getElementById('uploadExcelBtn');
+const excelFileInput = document.getElementById('excelFileInput');
 const productModal = document.getElementById('productModal');
 const editModal = document.getElementById('editModal');
 const productForm = document.getElementById('productForm');
@@ -30,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Event Listeners
 function setupEventListeners() {
     addNewBtn.addEventListener('click', () => openAddModal());
+    uploadExcelBtn.addEventListener('click', () => excelFileInput.click());
+    excelFileInput.addEventListener('change', handleExcelUpload);
+
     closeBtn.addEventListener('click', () => closeModal(productModal));
     editCloseBtn.addEventListener('click', () => closeModal(editModal));
     cancelBtn.addEventListener('click', () => closeModal(productModal));
@@ -259,4 +264,69 @@ function showNotification(message, type) {
     setTimeout(() => {
         notification.classList.remove('show');
     }, 3000);
+}
+
+async function handleExcelUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 파일 확장자 확인
+    const fileName = file.name.toLowerCase();
+    if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+        showNotification('엑셀 파일(.xlsx, .xls)만 업로드 가능합니다', 'error');
+        excelFileInput.value = '';
+        return;
+    }
+
+    // 파일 크기 확인 (10MB 제한)
+    if (file.size > 10 * 1024 * 1024) {
+        showNotification('파일 크기는 10MB 이하만 가능합니다', 'error');
+        excelFileInput.value = '';
+        return;
+    }
+
+    // 확인 대화상자
+    if (!confirm(`${file.name} 파일을 업로드하시겠습니까?\n\n상품명을 기준으로 기존 상품은 업데이트되고, 새로운 상품은 추가됩니다.`)) {
+        excelFileInput.value = '';
+        return;
+    }
+
+    try {
+        // FormData 생성
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // 업로드 중 메시지
+        showNotification('엑셀 파일 업로드 중...', 'success');
+
+        // API 호출
+        const response = await fetch(`${API_BASE_URL}/products/upload-excel`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to upload file');
+        }
+
+        const result = await response.json();
+
+        // 성공 메시지
+        showNotification(result.message, 'success');
+
+        // 상세 정보를 콘솔에 출력
+        console.log('업로드 결과:', result.details);
+
+        // 파일 input 초기화
+        excelFileInput.value = '';
+
+        // 상품 목록 새로고침
+        loadProducts();
+
+    } catch (error) {
+        console.error('Error uploading Excel:', error);
+        showNotification(error.message || '엑셀 업로드 실패', 'error');
+        excelFileInput.value = '';
+    }
 }

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
@@ -9,6 +9,9 @@ import product_models
 import product_schemas
 import product_crud
 from database import engine, get_db, sales_engine, get_sales_db
+import os
+import shutil
+from datetime import datetime
 
 models.Base.metadata.create_all(bind=engine)
 product_models.SalesBase.metadata.create_all(bind=sales_engine)
@@ -181,6 +184,61 @@ async def delete_product(product_id: int, db: Session = Depends(get_sales_db)):
 async def get_product_brands(db: Session = Depends(get_sales_db)):
     """모든 상품 브랜드 목록 조회"""
     return product_crud.get_all_brands(db)
+
+
+@app.post("/api/products/upload-excel")
+async def upload_excel(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_sales_db)
+):
+    """
+    엑셀 파일을 업로드하여 상품 정보를 일괄 업데이트/추가
+
+    엑셀 파일 형식:
+    - 헤더: 대표상품, 상품코드, 상품명, 공급처코드, 공급처, 원가(부가세포함)
+    - 상품명을 기준으로 기존 상품은 업데이트, 새로운 상품은 추가
+    """
+    # 파일 확장자 확인
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(
+            status_code=400,
+            detail="엑셀 파일(.xlsx, .xls)만 업로드 가능합니다."
+        )
+
+    # 임시 디렉토리 생성
+    temp_dir = "temp_uploads"
+    os.makedirs(temp_dir, exist_ok=True)
+
+    # 파일 저장
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(temp_dir, f"{timestamp}_{file.filename}")
+
+    try:
+        # 파일 저장
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        # 엑셀 처리
+        result = product_crud.process_excel_upload(db, file_path)
+
+        # 임시 파일 삭제
+        os.remove(file_path)
+
+        return {
+            "success": True,
+            "message": f"처리 완료: {result['created']}개 생성, {result['updated']}개 업데이트, {result['errors']}개 오류",
+            "details": result
+        }
+
+    except Exception as e:
+        # 오류 발생 시 임시 파일 삭제
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"파일 처리 중 오류 발생: {str(e)}"
+        )
 
 
 if __name__ == "__main__":

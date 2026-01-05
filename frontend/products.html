@@ -28,7 +28,11 @@
                 <input type="text" id="searchInput" placeholder="상품명 입력...">
                 <button id="searchBtn" class="btn btn-secondary">검색</button>
             </div>
-            <button id="addNewBtn" class="btn btn-primary">+ 새 상품 추가</button>
+            <div class="action-buttons">
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;">
+                <button id="uploadExcelBtn" class="btn btn-success">📊 엑셀 업로드</button>
+                <button id="addNewBtn" class="btn btn-primary">+ 새 상품 추가</button>
+            </div>
         </div>
 
         <div class="stats-section">
