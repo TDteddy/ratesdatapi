@@ -286,7 +286,7 @@ async function handleExcelUpload(e) {
     }
 
     // 확인 대화상자
-    if (!confirm(`${file.name} 파일을 업로드하시겠습니까?\n\n상품명을 기준으로 기존 상품은 업데이트되고, 새로운 상품은 추가됩니다.`)) {
+    if (!confirm(`${file.name} 파일을 업로드하시겠습니까?\n\n상품명을 기준으로 기존 상품의 원가만 업데이트됩니다.`)) {
         excelFileInput.value = '';
         return;
     }

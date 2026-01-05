@@ -71,33 +71,32 @@ def search_products(db: Session, search_term: str) -> List[product_models.Standa
 
 def process_excel_upload(db: Session, file_path: str) -> Dict[str, int]:
     """
-    엑셀 파일을 읽어서 상품 정보를 업데이트/추가합니다.
+    엑셀 파일을 읽어서 상품 원가를 업데이트합니다.
 
-    반환값: {"created": 생성된 수, "updated": 업데이트된 수, "errors": 오류 수}
+    반환값: {"updated": 업데이트된 수, "not_found": 찾을 수 없는 상품 수, "errors": 오류 수}
     """
     try:
         # 엑셀 파일 읽기
         df = pd.read_excel(file_path, engine='openpyxl')
 
         # 필요한 컬럼 확인
-        required_columns = ['대표상품', '상품명', '원가(부가세포함)']
+        required_columns = ['상품명', '원가(부가세포함)']
         missing_columns = [col for col in required_columns if col not in df.columns]
 
         if missing_columns:
             raise ValueError(f"필수 컬럼이 없습니다: {', '.join(missing_columns)}")
 
-        created = 0
         updated = 0
+        not_found = 0
         errors = 0
 
         for index, row in df.iterrows():
             try:
                 # 필수 값 확인
                 product_name = str(row['상품명']).strip() if pd.notna(row['상품명']) else None
-                brand = str(row['대표상품']).strip() if pd.notna(row['대표상품']) else None
                 cost_price = row['원가(부가세포함)']
 
-                if not product_name or not brand:
+                if not product_name:
                     errors += 1
                     continue
 
@@ -114,19 +113,12 @@ def process_excel_upload(db: Session, file_path: str) -> Dict[str, int]:
                 existing_product = get_product_by_name(db, product_name)
 
                 if existing_product:
-                    # 업데이트
-                    existing_product.brand = brand
+                    # 원가만 업데이트 (브랜드는 그대로 유지)
                     existing_product.cost_price = cost_price
                     updated += 1
                 else:
-                    # 새로 생성
-                    new_product = product_models.StandardProduct(
-                        product_name=product_name,
-                        brand=brand,
-                        cost_price=cost_price
-                    )
-                    db.add(new_product)
-                    created += 1
+                    # 상품을 찾을 수 없음
+                    not_found += 1
 
             except Exception as e:
                 errors += 1
@@ -137,8 +129,8 @@ def process_excel_upload(db: Session, file_path: str) -> Dict[str, int]:
         db.commit()
 
         return {
-            "created": created,
             "updated": updated,
+            "not_found": not_found,
             "errors": errors,
             "total": len(df)
         }
@@ -146,3 +138,4 @@ def process_excel_upload(db: Session, file_path: str) -> Dict[str, int]:
     except Exception as e:
         db.rollback()
         raise Exception(f"엑셀 파일 처리 중 오류 발생: {str(e)}")
+

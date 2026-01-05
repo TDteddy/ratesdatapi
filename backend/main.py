@@ -192,11 +192,11 @@ async def upload_excel(
     db: Session = Depends(get_sales_db)
 ):
     """
-    엑셀 파일을 업로드하여 상품 정보를 일괄 업데이트/추가
+    엑셀 파일을 업로드하여 상품 원가를 일괄 업데이트
 
     엑셀 파일 형식:
-    - 헤더: 대표상품, 상품코드, 상품명, 공급처코드, 공급처, 원가(부가세포함)
-    - 상품명을 기준으로 기존 상품은 업데이트, 새로운 상품은 추가
+    - 필수 헤더: 상품명, 원가(부가세포함)
+    - 상품명을 기준으로 기존 상품의 원가만 업데이트
     """
     # 파일 확장자 확인
     if not file.filename.endswith(('.xlsx', '.xls')):
@@ -226,7 +226,7 @@ async def upload_excel(
 
         return {
             "success": True,
-            "message": f"처리 완료: {result['created']}개 생성, {result['updated']}개 업데이트, {result['errors']}개 오류",
+            "message": f"처리 완료: {result['updated']}개 업데이트, {result['not_found']}개 미발견, {result['errors']}개 오류",
             "details": result
         }
 
